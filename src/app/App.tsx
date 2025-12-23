@@ -4,6 +4,7 @@ import { HomeView } from './components/HomeView';
 import { ServicesView } from './components/ServicesView';
 import { BookingView } from './components/BookingView';
 import { ProfileView } from './components/ProfileView';
+import { EmployeeView } from './components/EmployeeView';
 import { AuthView } from './components/AuthView';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
 
@@ -15,6 +16,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>('');
+  const [userRole, setUserRole] = useState<string>('customer');
   const [isCheckingSession, setIsCheckingSession] = useState(true);
 
   // Check for existing session on mount
@@ -35,6 +37,7 @@ export default function App() {
           const data = await response.json();
           setAccessToken(localStorage.getItem('access_token'));
           setUserName(data.user_metadata?.name || 'User');
+          setUserRole(data.user_metadata?.role || 'customer');
         }
       } catch (error) {
         console.log('No active session');
@@ -46,15 +49,17 @@ export default function App() {
     checkSession();
   }, []);
 
-  const handleAuthSuccess = (token: string, name: string) => {
+  const handleAuthSuccess = (token: string, name: string, role: string = 'customer') => {
     setAccessToken(token);
     setUserName(name);
+    setUserRole(role);
     localStorage.setItem('access_token', token);
   };
 
   const handleSignOut = () => {
     setAccessToken(null);
     setUserName('');
+    setUserRole('customer');
     localStorage.removeItem('access_token');
     setActiveTab('home');
   };
@@ -71,6 +76,27 @@ export default function App() {
   // Show auth screen if not authenticated
   if (!accessToken) {
     return <AuthView onAuthSuccess={handleAuthSuccess} />;
+  }
+
+  // Show employee dashboard for employees
+  if (userRole === 'employee') {
+    return (
+      <div className="size-full bg-white text-black overflow-hidden">
+        <div className="h-full overflow-y-auto scrollbar-hide" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+          <EmployeeView accessToken={accessToken} />
+        </div>
+        
+        {/* Sign out button for employees */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <button
+            onClick={handleSignOut}
+            className="px-6 py-3 bg-black text-white rounded-full shadow-lg hover:bg-zinc-800 transition-all active:scale-95"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (

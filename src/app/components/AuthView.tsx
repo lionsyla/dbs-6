@@ -3,7 +3,7 @@ import { Sparkles, Mail, Lock, User, Phone, CheckCircle } from 'lucide-react';
 import logoImage from 'figma:asset/c428c5f5c0d719f3f68d5dc1c77e9fbaae155b4b.png';
 
 interface AuthViewProps {
-  onAuthSuccess: (accessToken: string, userName: string) => void;
+  onAuthSuccess: (accessToken: string, userName: string, role?: string) => void;
 }
 
 export function AuthView({ onAuthSuccess }: AuthViewProps) {
@@ -62,7 +62,8 @@ export function AuthView({ onAuthSuccess }: AuthViewProps) {
           throw new Error(signInData.error_description || 'Auto sign-in failed. Please sign in manually.');
         }
 
-        onAuthSuccess(signInData.access_token, name);
+        const role = 'customer';
+        onAuthSuccess(signInData.access_token, name, role);
       } else {
         // Sign in
         const response = await fetch(
@@ -87,7 +88,7 @@ export function AuthView({ onAuthSuccess }: AuthViewProps) {
           throw new Error(data.error_description || 'Sign in failed');
         }
 
-        // Get user data to retrieve name
+        // Get user data to retrieve name and role
         const userResponse = await fetch(
           `https://${(window as any).SUPABASE_PROJECT_ID}.supabase.co/auth/v1/user`,
           {
@@ -100,8 +101,9 @@ export function AuthView({ onAuthSuccess }: AuthViewProps) {
 
         const userData = await userResponse.json();
         const userName = userData.user_metadata?.name || 'User';
+        const role = userData.user_metadata?.role || 'customer';
 
-        onAuthSuccess(data.access_token, userName);
+        onAuthSuccess(data.access_token, userName, role);
       }
     } catch (err: any) {
       console.error('Authentication error:', err);
