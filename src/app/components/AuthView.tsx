@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Sparkles, Mail, Lock, User, Phone, CheckCircle } from 'lucide-react';
-import logoImage from 'figma:asset/c428c5f5c0d719f3f68d5dc1c77e9fbaae155b4b.png';
 
 interface AuthViewProps {
   onAuthSuccess: (accessToken: string, userName: string, role?: string) => void;
