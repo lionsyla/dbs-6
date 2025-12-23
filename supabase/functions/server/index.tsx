@@ -8,7 +8,7 @@ const app = new Hono();
 // ⚙️ EMPLOYEE MANAGEMENT - Add authorized employee emails here
 const AUTHORIZED_EMPLOYEE_EMAILS = [
   // Add employee emails here, e.g.:
-  // "manager@dardansbarbershop.com",
+  "florent.syla@outlook.com",
   // "staff@dardansbarbershop.com"
 ];
 
