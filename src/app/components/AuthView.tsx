@@ -62,7 +62,20 @@ export function AuthView({ onAuthSuccess }: AuthViewProps) {
           throw new Error(signInData.error_description || 'Auto sign-in failed. Please sign in manually.');
         }
 
-        const role = 'customer';
+        // Get user data to retrieve role
+        const userResponse = await fetch(
+          `https://${(window as any).SUPABASE_PROJECT_ID}.supabase.co/auth/v1/user`,
+          {
+            headers: {
+              'Authorization': `Bearer ${signInData.access_token}`,
+              'apikey': (window as any).SUPABASE_ANON_KEY
+            }
+          }
+        );
+
+        const userData = await userResponse.json();
+        const role = userData.user_metadata?.role || 'customer';
+
         onAuthSuccess(signInData.access_token, name, role);
       } else {
         // Sign in
